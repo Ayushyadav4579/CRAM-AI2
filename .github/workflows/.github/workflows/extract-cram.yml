@@ -1,0 +1,38 @@
+name: Extract CRAM AI ZIP
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  extract:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Extract CRAM AI ZIP
+        run: |
+          rm -rf extracted-cram
+          mkdir -p extracted-cram
+          unzip -o "CRAM-AI-VERCEL-READY.zip" -d extracted-cram
+
+      - name: Copy extracted files to repository
+        run: |
+          cp -a extracted-cram/. .
+          rm -rf extracted-cram
+
+      - name: Remove ZIP
+        run: |
+          rm -f "CRAM-AI-VERCEL-READY.zip"
+
+      - name: Commit extracted files
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .
+          git diff --cached --quiet || git commit -m "Extract CRAM AI Vercel project"
+          git push
